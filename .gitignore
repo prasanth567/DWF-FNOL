@@ -1,0 +1,4 @@
+backend/bin/
+backend/obj/
+appsettings.json/
+backend/bin/Debug/net8.0/appsettings.json/

@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DWF FNOL</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(180deg, #e2106e 0%, #a31f5d 45%, #590f35 100%);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      position: relative;
+    }
+
+    .brand-logo {
+      position: fixed;
+      top: 12px;
+      left: 170px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 999;
+      background: transparent;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    .brand-logo img {
+      height: 70px;
+      width: auto;
+    }
+
+    .brand-logo span {
+      display: none;
+    }
+
+    .app-container {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      max-width: 620px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .header {
+      background: #003a79;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 2.2em;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .header p {
+      font-size: 0.95em;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .intro-section {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .start-btn {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      border: none;
+      color: white;
+      padding: 18px 45px;
+      font-size: 1.1em;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      font-weight: 600;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .start-btn:active {
+      transform: translateY(-1px);
+    }
+
+    #uploadSection {
+      display: none;
+      animation: slideDown 0.4s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .upload-area {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border: 3px dashed #667eea;
+      border-radius: 15px;
+      padding: 40px 20px;
+      text-align: center;
+      margin-bottom: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-area:hover {
+      border-color: #764ba2;
+      background: linear-gradient(135deg, #eef2f7 0%, #b8cfe6 100%);
+      transform: scale(1.02);
+    }
+
+    .upload-area.drag-over {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #e0e7ff 0%, #c3cfe2 100%);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .upload-icon {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+
+    .upload-area p {
+      margin: 10px 0;
+      font-size: 1em;
+      color: #555;
+    }
+
+    .upload-area small {
+      color: #888;
+      display: block;
+      margin-top: 8px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .file-info {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 20px 0;
+      border-left: 4px solid #667eea;
+      display: none;
+    }
+
+    .file-info.visible {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .file-info-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+      font-size: 0.95em;
+    }
+
+    .file-info-label {
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .file-info-value {
+      color: #555;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .btn-upload {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-upload:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-cancel {
+      background: #e8e8e8;
+      color: #555;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-cancel:hover {
+      background: #d8d8d8;
+      transform: translateY(-2px);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 10px;
+      margin: 20px 0;
+      display: none;
+      overflow: hidden;
+    }
+
+    .progress-bar.visible {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      width: 0%;
+      animation: progress 2s ease-in-out infinite;
+      border-radius: 10px;
+    }
+
+    @keyframes progress {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    .message {
+      padding: 16px;
+      border-radius: 12px;
+      margin: 20px 0;
+      font-weight: 500;
+      display: none;
+      animation: slideIn 0.3s ease-out;
+      border-left: 4px solid;
+    }
+
+    .message.visible {
+      display: block;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border-left-color: #28a745;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border-left-color: #dc3545;
+    }
+
+    .message.uploading {
+      background: #fff3cd;
+      color: #856404;
+      border-left-color: #ffc107;
+    }
+
+    .status-board {
+      margin-top: 20px;
+      border: 1px solid #e9ecef;
+      border-radius: 14px;
+      padding: 16px;
+      background: #ffffff;
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .status-board h3 {
+      margin-bottom: 10px;
+      font-size: 1em;
+      color: #003a79;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f3f5;
+      padding: 8px 0;
+      font-size: 0.9em;
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+
+    .status-label {
+      color: #333;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 66%;
+    }
+
+    .status-state {
+      font-weight: 600;
+      color: #5c6ac4;
+    }
+
+    .status-state.uploading {
+      color: #ff9800;
+    }
+
+    .status-state.uploaded {
+      color: #28a745;
+    }
+
+    .status-state.error {
+      color: #dc3545;
+    }
+
+    .sas-results {
+      margin-top: 20px;
+      background: #f8f9fa;
+      border: 1px dashed #667eea;
+      border-radius: 12px;
+      padding: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .sas-results .sas-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px;
+      border-bottom: 1px solid #d8dde6;
+    }
+
+    .sas-results .sas-row:last-child {
+      border-bottom: none;
+    }
+
+    .sas-results .sas-link {
+      color: #1e3a8a;
+      text-decoration: none;
+      flex: 1;
+      margin-right: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sas-results .sas-link:hover {
+      text-decoration: underline;
+    }
+
+    .sas-results .copy-btn {
+      border: none;
+      background: #667eea;
+      color: white;
+      border-radius: 8px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sas-results .copy-btn:hover {
+      background: #5164cc;
+    }
+    .sas-results .copy-btn:active {
+      transform: translateY(1px);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 2px solid #f0f0f0;
+    }
+
+    .stat-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid #e9ecef;
+    }
+
+    .stat-number {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .stat-label {
+      font-size: 0.85em;
+      color: #888;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="brand-logo">
+    <img id="logoImage" src="https://dwfgroup.com/-/media/dwf-global-site/images/brand-assets/dwf-400px.svg?h=400&w=400&la=en&hash=17EEEE336ACC8E87F6962E1EAF7D5330" alt="DWF Logo">
+  </div>
+
+  <div class="app-container">
+    <div class="header">
+      <h1>DWF FNOL</h1>
+      <p>Secure File Upload Service</p>
+    </div>
+
+    <div class="content">
+      <div class="intro-section" id="introSection">
+        <h2 style="font-size: 1.5em; color: #667eea; margin-bottom: 15px;">Welcome to DWF File Upload Service</h2>
+        <p style="color: #666; margin-bottom: 20px;">Upload your PDF and image files securely to the cloud</p>
+        <button class="start-btn" id="startBtn">🚀 Start upload</button>
+      </div>
+
+      <div id="uploadSection">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📁</div>
+          <p><strong>Click to upload or drag and drop</strong></p>
+          <small>Supports: PDF, PNG, JPG, GIF, WEBP, BMP | Max size: 10MB (PDF), 5MB (Images), max 3 files</small>
+        </div>
+        <input type="file" id="fileInput" accept="application/pdf,image/*" multiple />
+
+        <div class="file-info" id="fileInfo">
+          <div style="font-weight:600; margin-bottom:8px; color:#003a79;">Selected files</div>
+          <ul id="fileList" style="list-style:none; padding-left:0; margin:0;"></ul>
+          <div style="margin-top:10px; color:#555; font-size:0.9em;">(Max 3 files, each file: PDF ≤10MB, images ≤5MB)</div>
+        </div>
+
+        <div class="status-board" id="statusBoard" style="display:none;">
+          <h3>Upload progress</h3>
+          <div id="statusItems"></div>
+        </div>
+
+        <div class="sas-results" id="sasResults" style="display:none;"><strong>SAS URLs</strong></div>
+
+        <div class="message" id="message"></div>
+        <div class="progress-bar" id="progressBar">
+          <div class="progress-fill"></div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn btn-upload" onclick="uploadFile()">📤 Upload File</button>
+          <button class="btn btn-send" id="sendBtn" onclick="sendAndPostSasUrls()" style="display:none; background: linear-gradient(45deg, #1abc9c, #16a085); color: white;">📩 Send the SASURL and post to endpoint</button>
+          <button class="btn btn-send" id="testEndpointBtn" onclick="testEndpoint()" style="display:none; background: linear-gradient(45deg, #3498db, #2980b9); color: white;">🧪 Test Forward Endpoint</button>
+          <button class="btn btn-cancel" onclick="cancelUpload()">❌ Cancel</button>
+        </div>
+      </div>
+
+      <!-- <div class="stats" id="stats" style="display: none;">
+        <div class="stat-card">
+          <div class="stat-number">✅</div>
+          <div class="stat-label">Ready to Upload</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">🔒</div>
+          <div class="stat-label">Secure Transfer</div>
+        </div>
+      </div> -->
+    </div>
+  </div>
+
+<script>
+let selectedFiles = [];
+let uploadedFiles = [];
+let uploadStatuses = [];
+const maxFiles = 3;
+const uploadUrl = 'http://localhost:5001/api/upload';
+const sasUrlEndpoint = 'http://localhost:5001/api/upload/sas';
+
+function renderFileStatus() {
+  const statusBoard = document.getElementById('statusBoard');
+  const statusItems = document.getElementById('statusItems');
+  if (!uploadStatuses.length) {
+    statusBoard.style.display = 'none';
+    statusItems.innerHTML = '';
+    return;
+  }
+
+  statusBoard.style.display = 'block';
+  statusItems.innerHTML = uploadStatuses.map((item, index) => `
+    <div class="status-item">
+      <div class="status-label">${index + 1}. ${item.name}</div>
+      <div class="status-state ${item.state}">${item.stateLabel}</div>
+    </div>
+  `).join('');
+}
+
+function updateFileStatus(index, state, message = '') {
+  if (!uploadStatuses[index]) return;
+
+  const stateLabel = {
+    pending: 'Pending',
+    uploading: 'Uploading',
+    uploaded: 'Uploaded',
+    sas: 'SAS Ready',
+    done: 'Done',
+    error: 'Error'
+  }[state] || state;
+
+  uploadStatuses[index] = {
+    ...uploadStatuses[index],
+    state,
+    stateLabel: message ? `${stateLabel} (${message})` : stateLabel
+  };
+  renderFileStatus();
+}
+
+// Start button functionality
+document.getElementById("startBtn").onclick = () => {
+  document.getElementById("introSection").style.display = "none";
+  document.getElementById("uploadSection").style.display = "block";
+};
+
+// Upload area drag and drop
+const uploadArea = document.getElementById("uploadArea");
+let fileInput = document.getElementById("fileInput");
+
+function setupFileInputListeners() {
+  fileInput.addEventListener("change", (e) => {
+    if (e.target.files.length > 0) {
+      handleFileSelect(e.target.files);
+    }
+  });
+}
+
+uploadArea.addEventListener("click", () => fileInput.click());
+
+uploadArea.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  uploadArea.classList.add("drag-over");
+});
+
+uploadArea.addEventListener("dragleave", () => {
+  uploadArea.classList.remove("drag-over");
+});
+
+uploadArea.addEventListener("drop", (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove("drag-over");
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    fileInput.files = files;
+    handleFileSelect(files);
+  }
+});
+
+setupFileInputListeners();
+
+function handleFileSelect(files) {
+  selectedFiles = Array.from(files);
+
+  if (selectedFiles.length > maxFiles) {
+    setMessage(`❌ Maximum ${maxFiles} files allowed. Only the first ${maxFiles} will be used.`, "error");
+    selectedFiles = selectedFiles.slice(0, maxFiles);
+  }
+
+  uploadStatuses = selectedFiles.map((file) => ({
+    name: file.name,
+    state: 'pending',
+    stateLabel: 'Pending'
+  }));
+  renderFileStatus();
+
+  const fileList = document.getElementById("fileList");
+  fileList.innerHTML = "";
+
+  selectedFiles.forEach((file, index) => {
+    const fileItem = document.createElement("li");
+    fileItem.textContent = `${index + 1}. ${file.name} - ${(file.size / (1024 * 1024)).toFixed(2)} MB - ${file.type || "Unknown"}`;
+    fileList.appendChild(fileItem);
+  });
+
+  document.getElementById("fileInfo").classList.add("visible");
+  clearMessage();
+}
+
+async function uploadFile() {
+  const files = fileInput.files;
+
+  if (!files || files.length === 0) {
+    setMessage("Please select at least one file first!", "error");
+    return;
+  }
+
+  if (files.length > maxFiles) {
+    setMessage(`❌ Maximum ${maxFiles} files allowed. Please select up to ${maxFiles}.`, "error");
+    return;
+  }
+
+  const maxSizePDF = 10 * 1024 * 1024;
+  const maxSizeImage = 5 * 1024 * 1024;
+
+  for (const file of files) {
+    if (file.type !== "application/pdf" && !file.type.startsWith("image/")) {
+      setMessage("❌ Only PDF and image files are allowed!", "error");
+      return;
+    }
+
+    const maxSize = file.type === "application/pdf" ? maxSizePDF : maxSizeImage;
+    const maxSizeMB = file.type === "application/pdf" ? 10 : 5;
+
+    if (file.size > maxSize) {
+      setMessage(`❌ File ${file.name} exceeds limit (max ${maxSizeMB}MB).`, "error");
+      return;
+    }
+  }
+
+  selectedFiles.forEach((_, index) => updateFileStatus(index, 'uploading'));
+
+  const formData = new FormData();
+  for (const file of selectedFiles) {
+    formData.append('files', file);
+  }
+
+  document.getElementById("progressBar").classList.add("visible");
+  setMessage("📤 Uploading...", "uploading");
+  document.querySelectorAll(".btn").forEach((btn) => (btn.disabled = true));
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', uploadUrl, true);
+
+  xhr.upload.onprogress = (event) => {
+    if (event.lengthComputable) {
+      const percent = Math.floor((event.loaded / event.total) * 100);
+      document.querySelector('.progress-fill').style.width = `${percent}%`;
+      setMessage(`📤 Uploading... ${percent}%`, 'uploading');
+    }
+  };
+
+  xhr.onload = () => {
+    document.getElementById("progressBar").classList.remove("visible");
+    document.querySelectorAll(".btn").forEach((btn) => (btn.disabled = false));
+
+    if (xhr.status >= 200 && xhr.status < 300) {
+      let result;
+      try {
+        result = JSON.parse(xhr.responseText);
+      } catch (e) {
+        setMessage("❌ Upload failed: invalid server response.", "error");
+        selectedFiles.forEach((_, idx) => updateFileStatus(idx, 'error', 'parsing error'));
+        return;
+      }
+
+      setMessage(`✅ Upload successful! ${selectedFiles.length} file(s) uploaded.`, "success");
+      uploadedFiles = result.files || [];
+      uploadedFiles.forEach((_, idx) => updateFileStatus(idx, 'uploaded'));
+
+      if (uploadedFiles.length > 0) {
+        document.getElementById("sendBtn").style.display = "inline-flex";
+        document.getElementById("testEndpointBtn").style.display = "inline-flex";
+      }
+
+      // show SAS container cleared until user requests generation
+      document.getElementById('sasResults').style.display = 'none';
+      document.getElementById('sasResults').innerHTML = '<strong>SAS URLs</strong>';
+
+    } else {
+      setMessage(`❌ Error: ${xhr.status} ${xhr.statusText}`, "error");
+      selectedFiles.forEach((_, idx) => updateFileStatus(idx, 'error', `HTTP ${xhr.status}`));
+    }
+  };
+
+  xhr.onerror = () => {
+    document.getElementById("progressBar").classList.remove("visible");
+    document.querySelectorAll(".btn").forEach((btn) => (btn.disabled = false));
+    setMessage("❌ Upload failed: network error.", "error");
+    selectedFiles.forEach((_, idx) => updateFileStatus(idx, 'error', 'network'));
+  };
+
+  xhr.send(formData);
+}
+
+function setMessage(text, type) {
+  const messageEl = document.getElementById("message");
+  messageEl.textContent = text;
+  messageEl.className = `message visible ${type}`;
+}
+
+function clearMessage() {
+  const messageEl = document.getElementById("message");
+  messageEl.className = "message";
+  messageEl.textContent = "";
+}
+
+function cancelUpload() {
+  document.getElementById("uploadSection").style.display = "none";
+  document.getElementById("introSection").style.display = "block";
+  document.getElementById("sendBtn").style.display = "none";
+  document.getElementById("testEndpointBtn").style.display = "none";
+  uploadedFiles = [];
+  resetForm();
+}
+
+function resetForm() {
+  const oldFileInput = document.getElementById("fileInput");
+  fileInput = oldFileInput.cloneNode(true);
+  oldFileInput.parentNode.replaceChild(fileInput, oldFileInput);
+
+  selectedFiles = [];
+  document.getElementById("fileInfo").classList.remove("visible");
+  document.getElementById("fileList").innerHTML = "";
+  document.getElementById("progressBar").classList.remove("visible");
+  clearMessage();
+
+  setupFileInputListeners();
+}
+
+function getBlobNameFromUrl(blobUrl) {
+  try {
+    const url = new URL(blobUrl);
+    const segments = url.pathname.split('/').filter(Boolean); // [container, path...]
+    if (segments.length < 2) return null;
+    segments.shift(); // remove container
+    const rawName = segments.join('/');
+    // Ensure it's decoded once for proper server lookup
+    return decodeURIComponent(rawName);
+  } catch (_) {
+    return null;
+  }
+}
+
+function renderSasResults(results) {
+  const container = document.getElementById('sasResults');
+  if (!results || results.length === 0) {
+    container.style.display = 'none';
+    container.innerHTML = '<strong>SAS URLs</strong>';
+    return;
+  }
+
+  container.style.display = 'block';
+  container.innerHTML = '<strong>SAS URLs</strong>' + results.map((item, idx) => `
+    <div class="sas-row" id="sas-row-${idx}">
+      <div style="flex: 1; margin-right: 8px;">
+        <a class="sas-link" href="${item.sasUrl}" target="_blank" rel="noreferrer" title="${item.sasUrl}">${item.fileName}</a>
+        <div style="font-size:0.75em; color:#555; margin-top:4px;">
+          Forward: ${item.forwarded ? '✅' : '❌'}
+          • Stored: ${item.stored ? '✅' : '❌'}
+          ${item.storeMessage ? `• ${item.storeMessage}` : ''}
+        </div>
+      </div>
+      <button class="copy-btn" onclick="copySasUrl(${idx})">📋 Copy</button>
+    </div>
+  `).join('');
+}
+
+function copySasUrl(index) {
+  const container = document.getElementById('sasResults');
+  const row = container.querySelector(`#sas-row-${index}`);
+  if (!row) return;
+
+  const link = row.querySelector('.sas-link');
+  if (!link) return;
+
+  navigator.clipboard.writeText(link.href)
+    .then(() => setMessage(`✅ SAS URL copied for ${link.textContent}`, 'success'))
+    .catch((err) => setMessage(`❌ Copy failed: ${err}`, 'error'));
+}
+
+async function generateSasUrls() {
+  if (!uploadedFiles || uploadedFiles.length === 0) {
+    setMessage('❌ No uploaded files to generate SAS for.', 'error');
+    return;
+  }
+
+  document.getElementById('progressBar').classList.add('visible');
+  setMessage('🔐 Generating SAS URLs, please wait...', 'uploading');
+  document.querySelectorAll('.btn').forEach((btn) => (btn.disabled = true));
+
+  const sasResults = [];
+
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    const file = uploadedFiles[i];
+    updateFileStatus(i, 'sas', 'Requesting');
+
+    try {
+      const blobName = getBlobNameFromUrl(file.blobUrl);
+      if (!blobName) {
+        throw new Error(`Invalid blob URL for file ${file.fileName}`);
+      }
+
+      const response = await fetch(`${sasUrlEndpoint}?blobName=${encodeURIComponent(blobName)}`);
+      if (!response.ok) {
+        const errorBody = await response.text();
+        updateFileStatus(i, 'error', `${response.status}`);
+        throw new Error(`SAS request failed for ${file.fileName} (${response.status}) ${errorBody}`);
+      }
+
+      const data = await response.json();
+      sasResults.push({ fileName: file.fileName, sasUrl: data.sasUrl });
+      updateFileStatus(i, 'done');
+      renderSasResults(sasResults);
+    } catch (error) {
+      updateFileStatus(i, 'error', error.message);
+      setMessage(`❌ SAS generation partial failure: ${error.message}`, 'error');
+    }
+  }
+
+  if (sasResults.length > 0) {
+    setMessage(`✅ SAS URLs generated for ${sasResults.length}/${uploadedFiles.length} file(s).`, 'success');
+    renderSasResults(sasResults);
+    window.currentSasResults = sasResults; // global for send
+  }
+
+  document.getElementById('progressBar').classList.remove('visible');
+  document.querySelectorAll('.btn').forEach((btn) => (btn.disabled = false));
+}
+
+async function forwardSasToBackend(sasUrl) {
+  const response = await fetch('http://localhost:5001/api/upload/forward-sas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sasUrl })
+  });
+
+  if (!response.ok) {
+    let body;
+    try { body = await response.json(); } catch (_) { body = await response.text(); }
+    throw new Error(`Forward API failed (${response.status}) ${JSON.stringify(body)}`);
+  }
+
+  const result = await response.json();
+  // Normalize expected fields from backend path
+  return {
+    forwarded: result.forwarded === true,
+    stored: result.stored === true,
+    storeMessage: result.storeMessage || null,
+    storeDetails: result.storeDetails || null,
+    sasUrl: result.sasUrl || sasUrl,
+    raw: result
+  };
+}
+
+async function sendAndPostSasUrls() {
+  if (!uploadedFiles || uploadedFiles.length === 0) {
+    setMessage('❌ No uploaded files to process.', 'error');
+    return;
+  }
+
+  document.getElementById('progressBar').classList.add('visible');
+  setMessage('📩 Generating SAS and forwarding via POST...', 'uploading');
+  document.querySelectorAll('.btn').forEach((btn) => (btn.disabled = true));
+
+  const results = [];
+
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    const file = uploadedFiles[i];
+    const blobName = getBlobNameFromUrl(file.blobUrl);
+    if (!blobName) {
+      updateFileStatus(i, 'error', 'Invalid blob URL');
+      continue;
+    }
+
+    try {
+      const sasResponse = await fetch(`${sasUrlEndpoint}?blobName=${encodeURIComponent(blobName)}`);
+      if (!sasResponse.ok) {
+        const err = await sasResponse.text();
+        updateFileStatus(i, 'error', `SAS ${sasResponse.status}`);
+        setMessage(`❌ Failed to generate SAS for ${file.fileName}: ${sasResponse.status} ${err}`, 'error');
+        continue;
+      }
+
+      const sasData = await sasResponse.json();
+      if (!sasData.sasUrl) {
+        updateFileStatus(i, 'error', 'No sasUrl');
+        setMessage(`❌ No SAS URL returned for ${file.fileName}.`, 'error');
+        continue;
+      }
+
+      const forwardData = await forwardSasToBackend(sasData.sasUrl);
+      if (!forwardData.forwarded) {
+        updateFileStatus(i, 'error', 'Forward failed');
+        setMessage(`❌ Forward failed for ${file.fileName}: ${forwardData.raw?.error || 'unknown'}`, 'error');
+        continue;
+      }
+
+      const forwardStatus = forwardData.stored ? 'Forwarded+Stored' : 'Forwarded, store failed';
+      updateFileStatus(i, 'done', forwardStatus);
+
+      if (!forwardData.stored) {
+        setMessage(`⚠️ SAS forwarded but storage step failed for ${file.fileName}: ${forwardData.storeMessage}`, 'error');
+      }
+
+      results.push({
+        fileName: file.fileName,
+        sasUrl: sasData.sasUrl,
+        forwarded: forwardData.forwarded,
+        stored: forwardData.stored,
+        storeMessage: forwardData.storeMessage
+      });
+    } catch (err) {
+      updateFileStatus(i, 'error', 'Network error');
+      setMessage(`❌ ${err.message}`, 'error');
+    }
+  }
+
+  document.getElementById('progressBar').classList.remove('visible');
+  document.querySelectorAll('.btn').forEach((btn) => (btn.disabled = false));
+
+  if (results.length > 0) {
+    window.currentSasResults = results;
+    renderSasResults(results);
+    setMessage(`✅ Forwarded ${results.length}/${uploadedFiles.length} SAS URLs.`, 'success');
+  } else {
+    setMessage('❌ No SAS URLs forwarded successfully.', 'error');
+  }
+}
+
+async function testEndpoint() {
+  await sendAndPostSasUrls();
+}
+
+</script>
+
+</body>
+</html>
