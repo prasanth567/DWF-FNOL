@@ -522,8 +522,8 @@ let selectedFiles = [];
 let uploadedFiles = [];
 let uploadStatuses = [];
 const maxFiles = 3;
-const uploadUrl = 'http://localhost:5001/api/upload';
-const sasUrlEndpoint = 'http://localhost:5001/api/upload/sas';
+const uploadUrl = 'https://dwf-fnol-6.onrender.com/api/upload';
+const sasUrlEndpoint = 'https://dwf-fnol-6.onrender.com/api/upload/sas';
 
 function renderFileStatus() {
   const statusBoard = document.getElementById('statusBoard');
@@ -864,7 +864,7 @@ async function generateSasUrls() {
 }
 
 async function forwardSasToBackend(sasUrl) {
-  const response = await fetch('http://localhost:5001/api/upload/forward-sas', {
+  const response = await fetch('https://dwf-fnol-6.onrender.com/api/upload/forward-sas', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sasUrl })
